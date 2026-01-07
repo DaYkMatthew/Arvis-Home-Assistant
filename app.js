@@ -120,13 +120,8 @@ const SmartHub = () => {
   const [customMinutes, setCustomMinutes] = useState('');
   const [newEventName, setNewEventName] = useState('');
   const [newEventDate, setNewEventDate] = useState('');
-  const [quotes] = useState([
-    { text: "The only way to do great work is to love what you do.", author: "Steve Jobs" },
-    { text: "Innovation distinguishes between a leader and a follower.", author: "Steve Jobs" },
-    { text: "Stay hungry, stay foolish.", author: "Steve Jobs" },
-    { text: "The best time to plant a tree was 20 years ago. The second best time is now.", author: "Chinese Proverb" },
-    { text: "Your time is limited, don't waste it living someone else's life.", author: "Steve Jobs" }
-  ]);
+  const [dailyQuote, setDailyQuote] = useState({ text: "Loading quote...", author: "" });
+  const [tvPower, setTvPower] = useState(false);
   
   const correctPin = '0000';
 
@@ -141,14 +136,58 @@ const SmartHub = () => {
   }
 
   const getDailyQuote = () => {
-    const dayOfYear = Math.floor((time - new Date(time.getFullYear(), 0, 0)) / 1000 / 60 / 60 / 24);
-    return quotes[dayOfYear % quotes.length];
+    return dailyQuote;
+  };
+
+  const toggleTVPower = () => {
+    setTvPower(!tvPower);
+    alert(`TV Power: ${!tvPower ? 'ON' : 'OFF'}\n\nTo make this work, connect to your Hubspace smart plug API.`);
   };
 
   useEffect(() => {
     const timer = setInterval(() => setTime(new Date()), 1000);
     return () => clearInterval(timer);
   }, []);
+
+  useEffect(() => {
+    const fetchQuote = async () => {
+      try {
+        const response = await fetch('https://api.api-ninjas.com/v1/quotes?category=inspirational', {
+          headers: { 'X-Api-Key': 'U7Ws194YNpb2UN3KfisBNgfvEbsVlkD04qKa4K9v' }
+        });
+        const data = await response.json();
+        if (data && data[0]) {
+          setDailyQuote({ text: data[0].quote, author: data[0].author });
+        }
+      } catch (error) {
+        setDailyQuote({ 
+          text: "The only way to do great work is to love what you do.", 
+          author: "Steve Jobs" 
+        });
+      }
+    };
+
+    const lastFetch = localStorage.getItem('lastQuoteFetch');
+    const today = new Date().toDateString();
+    
+    if (lastFetch !== today) {
+      fetchQuote();
+      localStorage.setItem('lastQuoteFetch', today);
+    } else {
+      const saved = localStorage.getItem('dailyQuote');
+      if (saved) {
+        setDailyQuote(JSON.parse(saved));
+      } else {
+        fetchQuote();
+      }
+    }
+  }, []);
+
+  useEffect(() => {
+    if (dailyQuote.text !== "Loading quote...") {
+      localStorage.setItem('dailyQuote', JSON.stringify(dailyQuote));
+    }
+  }, [dailyQuote]);
 
   useEffect(() => {
     const timerInterval = setInterval(() => {
@@ -405,13 +444,32 @@ const SmartHub = () => {
   );
 
   if (currentPage === 'tv') {
-    const [spotifyUrl, setSpotifyUrl] = useState('https://open.spotify.com');
-    
     return (
       <div className="fixed inset-0 bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900 select-none overflow-y-auto">
         <div className="p-4 pb-20">
           <PageHeader title="Media & TV" color="blue" />
           
+          <div className="mb-4 p-5 rounded-2xl bg-gray-800 border-2 border-gray-700">
+            <h2 className="text-xl font-light text-white mb-3 flex items-center gap-3">
+              <div className={`w-3 h-3 rounded-full ${tvPower ? 'bg-green-500' : 'bg-red-500'}`}></div>
+              TV Power
+            </h2>
+            <button 
+              onClick={toggleTVPower}
+              className={`w-full p-6 rounded-xl border-2 text-white text-xl font-light active:scale-95 transition-all ${
+                tvPower 
+                  ? 'bg-red-600 active:bg-red-700 border-red-500' 
+                  : 'bg-green-600 active:bg-green-700 border-green-500'
+              }`}
+            >
+              <Power className="w-10 h-10 mx-auto mb-2" />
+              {tvPower ? 'Turn OFF' : 'Turn ON'}
+            </button>
+            <p className="text-sm text-gray-400 mt-3 text-center">
+              Controls TV via Hubspace smart plug
+            </p>
+          </div>
+
           <div className="mb-4 p-4 rounded-2xl bg-gray-800 border-2 border-gray-700">
             <div className="flex items-center gap-3 mb-3">
               <div className="w-3 h-3 rounded-full bg-green-500 animate-pulse"></div>
@@ -420,7 +478,7 @@ const SmartHub = () => {
             <p className="text-sm text-gray-400 mb-3">Shows what's playing on any of your devices</p>
             <div className="bg-black rounded-xl overflow-hidden" style={{height: '320px'}}>
               <iframe 
-                src={spotifyUrl}
+                src="https://open.spotify.com"
                 width="100%" 
                 height="320" 
                 frameBorder="0" 
@@ -430,12 +488,13 @@ const SmartHub = () => {
               ></iframe>
             </div>
             <div className="mt-3 grid grid-cols-2 gap-2">
-              <button 
-                onClick={() => setSpotifyUrl('https://open.spotify.com')}
+              <a 
+                href="https://open.spotify.com" 
+                target="_blank"
                 className="p-3 rounded-xl bg-green-600 active:bg-green-700 border-2 border-green-500 text-white text-center text-base active:scale-95 transition-all"
               >
                 Spotify Home
-              </button>
+              </a>
               <a 
                 href="spotify://" 
                 className="p-3 rounded-xl bg-gray-700 active:bg-gray-600 border-2 border-gray-600 text-white text-center text-base active:scale-95 transition-all flex items-center justify-center"
