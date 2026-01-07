@@ -260,6 +260,8 @@ const SmartHub = () => {
   );
 
   if (currentPage === 'tv') {
+    const [spotifyUrl, setSpotifyUrl] = useState('https://open.spotify.com');
+    
     return (
       <div className="fixed inset-0 bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900 select-none overflow-y-auto">
         <div className="p-6 pb-20">
@@ -268,14 +270,14 @@ const SmartHub = () => {
           <div className="mb-6 p-6 rounded-2xl bg-gray-800 border-2 border-gray-700">
             <div className="flex items-center gap-3 mb-4">
               <div className="w-3 h-3 rounded-full bg-green-500 animate-pulse"></div>
-              <h2 className="text-2xl font-light text-white">Spotify Web Player</h2>
+              <h2 className="text-2xl font-light text-white">Spotify</h2>
             </div>
-            <p className="text-lg text-gray-400 mb-4">Full Spotify controls - log in below to start playing</p>
-            <div className="bg-black rounded-xl overflow-hidden" style={{height: '380px'}}>
+            <p className="text-lg text-gray-400 mb-4">Shows what's playing on any of your devices</p>
+            <div className="bg-black rounded-xl overflow-hidden" style={{height: '500px'}}>
               <iframe 
-                src="https://open.spotify.com/embed/playlist/37i9dQZF1DXcBWIGoYBM5M" 
+                src={spotifyUrl}
                 width="100%" 
-                height="380" 
+                height="500" 
                 frameBorder="0" 
                 allowtransparency="true" 
                 allow="encrypted-media"
@@ -283,18 +285,17 @@ const SmartHub = () => {
               ></iframe>
             </div>
             <div className="mt-4 grid grid-cols-2 gap-3">
-              <a 
-                href="https://open.spotify.com" 
-                target="_blank"
+              <button 
+                onClick={() => setSpotifyUrl('https://open.spotify.com')}
                 className="p-4 rounded-xl bg-green-600 active:bg-green-700 border-2 border-green-500 text-white text-center text-lg active:scale-95 transition-all"
               >
-                Open Spotify Web
-              </a>
+                Spotify Home
+              </button>
               <a 
                 href="spotify://" 
-                className="p-4 rounded-xl bg-gray-700 active:bg-gray-600 border-2 border-gray-600 text-white text-center text-lg active:scale-95 transition-all"
+                className="p-4 rounded-xl bg-gray-700 active:bg-gray-600 border-2 border-gray-600 text-white text-center text-lg active:scale-95 transition-all flex items-center justify-center"
               >
-                Open Spotify App
+                Open App
               </a>
             </div>
           </div>
