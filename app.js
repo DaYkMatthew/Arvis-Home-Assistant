@@ -262,34 +262,40 @@ const SmartHub = () => {
   if (currentPage === 'tv') {
     return (
       <div className="fixed inset-0 bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900 select-none overflow-y-auto">
-        <div className="p-6">
+        <div className="p-6 pb-20">
           <PageHeader title="Media & TV" color="blue" />
           
           <div className="mb-6 p-6 rounded-2xl bg-gray-800 border-2 border-gray-700">
             <div className="flex items-center gap-3 mb-4">
-              <div className="w-3 h-3 rounded-full bg-green-500"></div>
-              <h2 className="text-2xl font-light text-white">Now Playing</h2>
+              <div className="w-3 h-3 rounded-full bg-green-500 animate-pulse"></div>
+              <h2 className="text-2xl font-light text-white">Spotify Web Player</h2>
             </div>
-            <p className="text-xl text-gray-300 mb-2">Not Connected</p>
-            <p className="text-lg text-gray-500">Connect Spotify to see what's playing</p>
-          </div>
-
-          <div className="mb-6 p-6 rounded-2xl bg-gray-800 border-2 border-gray-700">
-            <h2 className="text-2xl font-light text-white mb-4">Spotify</h2>
-            <div className="flex gap-4 justify-center mb-6">
-              <button className="p-5 rounded-full bg-gray-700 active:bg-gray-600 border-2 border-gray-600 active:scale-95">
-                <SkipForward className="w-8 h-8 text-white transform rotate-180" />
-              </button>
-              <button className="p-6 rounded-full bg-green-600 active:bg-green-700 border-2 border-green-500 active:scale-95">
-                <Play className="w-10 h-10 text-white" />
-              </button>
-              <button className="p-5 rounded-full bg-gray-700 active:bg-gray-600 border-2 border-gray-600 active:scale-95">
-                <SkipForward className="w-8 h-8 text-white" />
-              </button>
+            <p className="text-lg text-gray-400 mb-4">Full Spotify controls - log in below to start playing</p>
+            <div className="bg-black rounded-xl overflow-hidden" style={{height: '380px'}}>
+              <iframe 
+                src="https://open.spotify.com/embed/playlist/37i9dQZF1DXcBWIGoYBM5M" 
+                width="100%" 
+                height="380" 
+                frameBorder="0" 
+                allowtransparency="true" 
+                allow="encrypted-media"
+                style={{borderRadius: '12px'}}
+              ></iframe>
             </div>
-            <div className="flex items-center gap-4">
-              <Volume2 className="w-6 h-6 text-gray-400" />
-              <input type="range" className="flex-1 h-3 rounded-full" />
+            <div className="mt-4 grid grid-cols-2 gap-3">
+              <a 
+                href="https://open.spotify.com" 
+                target="_blank"
+                className="p-4 rounded-xl bg-green-600 active:bg-green-700 border-2 border-green-500 text-white text-center text-lg active:scale-95 transition-all"
+              >
+                Open Spotify Web
+              </a>
+              <a 
+                href="spotify://" 
+                className="p-4 rounded-xl bg-gray-700 active:bg-gray-600 border-2 border-gray-600 text-white text-center text-lg active:scale-95 transition-all"
+              >
+                Open Spotify App
+              </a>
             </div>
           </div>
 
