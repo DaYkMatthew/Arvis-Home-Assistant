@@ -8,7 +8,7 @@
   <script src="https://cdn.tailwindcss.com"></script>
   <style>
     * { user-select: none; }
-    body { margin: 0; background: linear-gradient(135deg, #2e1a2e 0%, #3e1638 100%); color: #fff; overflow-x: hidden; }
+    body { margin: 0; background: #000; color: #fff; overflow-x: hidden; }
     .notification-bar {
       position: fixed; top: 0; left: 0; right: 0;
       background: linear-gradient(90deg, #f59e0b, #d97706);
@@ -44,7 +44,7 @@
       </div>
     </div>
 
-    <div class="mb-4 p-5 rounded-2xl bg-purple-900/20 border border-purple-800">
+    <div class="mb-4 p-5 rounded-2xl bg-gray-900 border border-gray-800">
       <div id="time" class="text-5xl font-light mb-2">--:--</div>
       <div id="date" class="text-xl text-gray-400 mb-3">Loading...</div>
       <div class="flex gap-4 text-sm">
@@ -62,16 +62,16 @@
       <p id="author" class="text-sm text-gray-500">—</p>
     </div>
 
-    <div class="mb-4 p-4 rounded-2xl bg-purple-900/20 border border-purple-800">
+    <div class="mb-4 p-4 rounded-2xl bg-gray-900 border border-gray-800">
       <h2 class="text-lg font-light mb-3">Countdowns</h2>
-      <div id="weekend-countdown" class="mb-3 p-3 rounded-xl bg-purple-800/30">
+      <div id="weekend-countdown" class="mb-3 p-3 rounded-xl bg-gray-800">
         <div class="flex justify-between items-center">
           <span>Weekend</span>
-          <span class="text-purple-400 font-mono" id="weekend-time">--</span>
+          <span class="text-green-400 font-mono" id="weekend-time">--</span>
         </div>
       </div>
       <div id="custom-countdowns"></div>
-      <button onclick="addCountdown()" class="w-full p-3 rounded-xl bg-purple-800/30 text-gray-400 border border-purple-700 mt-2">
+      <button onclick="addCountdown()" class="w-full p-3 rounded-xl bg-gray-800 text-gray-400 border border-gray-700 mt-2">
         + Add Countdown
       </button>
     </div>
@@ -103,7 +103,7 @@
       </button>
     </div>
 
-    <div class="mb-4 p-4 rounded-2xl bg-purple-900/20 border border-purple-800">
+    <div class="mb-4 p-4 rounded-2xl bg-gray-900 border border-gray-800">
       <h2 class="text-lg font-light mb-3">Lights</h2>
       <p class="text-gray-500 text-sm">No lights configured</p>
     </div>
@@ -111,36 +111,36 @@
 
   <!-- Shout Modal -->
   <div id="shout-modal" class="hidden fixed inset-0 bg-black/80 flex items-center justify-center p-4 z-50">
-    <div class="bg-purple-900/40 backdrop-blur-xl rounded-2xl p-6 w-full max-w-md border border-purple-800">
+    <div class="bg-gray-900 rounded-2xl p-6 w-full max-w-md border border-gray-800">
       <h2 class="text-2xl mb-4">Send Shout</h2>
-      <textarea id="shout-message" placeholder="Your message..." class="w-full p-3 rounded-xl bg-purple-900/30 border border-purple-700 text-white mb-4 h-24"></textarea>
+      <textarea id="shout-message" placeholder="Your message..." class="w-full p-3 rounded-xl bg-gray-800 border border-gray-700 text-white mb-4 h-24"></textarea>
       <div class="mb-4">
         <p class="text-sm text-gray-400 mb-2">Send to:</p>
         <div class="flex gap-2 flex-wrap">
-          <label class="flex items-center gap-2 p-2 rounded-lg bg-purple-900/30 cursor-pointer">
+          <label class="flex items-center gap-2 p-2 rounded-lg bg-gray-800 cursor-pointer">
             <input type="checkbox" value="0920" class="shout-recipient">
             <span>Matthew</span>
           </label>
-          <label class="flex items-center gap-2 p-2 rounded-lg bg-purple-900/30 cursor-pointer">
+          <label class="flex items-center gap-2 p-2 rounded-lg bg-gray-800 cursor-pointer">
             <input type="checkbox" value="0304" class="shout-recipient">
             <span>Bryce</span>
           </label>
-          <label class="flex items-center gap-2 p-2 rounded-lg bg-purple-900/30 cursor-pointer">
+          <label class="flex items-center gap-2 p-2 rounded-lg bg-gray-800 cursor-pointer">
             <input type="checkbox" id="shout-all">
             <span>ALL</span>
           </label>
         </div>
       </div>
       <div class="flex gap-2">
-        <button onclick="sendShout()" class="flex-1 p-3 rounded-xl bg-purple-600">Send</button>
-        <button onclick="closeShout()" class="flex-1 p-3 rounded-xl bg-purple-900/30">Cancel</button>
+        <button onclick="sendShout()" class="flex-1 p-3 rounded-xl bg-blue-600">Send</button>
+        <button onclick="closeShout()" class="flex-1 p-3 rounded-xl bg-gray-800">Cancel</button>
       </div>
     </div>
   </div>
 
   <!-- Notifications Modal -->
   <div id="notif-modal" class="hidden fixed inset-0 bg-black/80 flex items-center justify-center p-4 z-50">
-    <div class="bg-purple-900/40 backdrop-blur-xl rounded-2xl p-6 w-full max-w-md border border-purple-800 max-h-[80vh] overflow-y-auto">
+    <div class="bg-gray-900 rounded-2xl p-6 w-full max-w-md border border-gray-800 max-h-[80vh] overflow-y-auto">
       <div class="flex justify-between items-center mb-4">
         <h2 class="text-2xl">Notifications</h2>
         <button onclick="closeNotifications()" class="text-gray-400">✕</button>
@@ -278,7 +278,7 @@
         list.innerHTML = '<p class="text-gray-500">No notifications</p>';
       } else {
         list.innerHTML = myShouts.reverse().map(s => `
-          <div class="p-3 rounded-xl bg-purple-900/30 mb-2">
+          <div class="p-3 rounded-xl bg-gray-800 mb-2">
             <div class="flex justify-between mb-1">
               <span class="font-medium">${s.fromName}</span>
               <span class="text-sm text-gray-500">${new Date(s.timestamp).toLocaleTimeString()}</span>
@@ -314,9 +314,9 @@
         const diff = target - now;
         const days = Math.floor(diff / (1000 * 60 * 60 * 24));
         const hours = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
-        return `<div class="mb-2 p-3 rounded-xl bg-purple-800/30 flex justify-between items-center">
+        return `<div class="mb-2 p-3 rounded-xl bg-gray-800 flex justify-between items-center">
           <span>${c.name}</span>
-          <span class="text-purple-400 font-mono">${days}d ${hours}h</span>
+          <span class="text-green-400 font-mono">${days}d ${hours}h</span>
         </div>`;
       }).join('');
     }
