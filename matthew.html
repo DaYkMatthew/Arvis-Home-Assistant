@@ -352,8 +352,23 @@
     updateWeekendCountdown();
 
     // Lights
-    function toggleLight(type) {
-      alert(`${type === 'room' ? 'Room Light' : 'LED Light'} toggled!\n\nConnect to smart home system to make this work.`);
+    async function toggleLight(type) {
+      if (type === 'led') {
+        const checkbox = event.target;
+        const isOn = checkbox.checked;
+        const url = isOn 
+          ? 'https://api-v2.voicemonkey.io/trigger?token=a39d2a6a59188f40be7fd47dcc8ada77_ef9bba4c4a30724315c537c97027b0fc&device=ledon'
+          : 'https://api-v2.voicemonkey.io/trigger?token=a39d2a6a59188f40be7fd47dcc8ada77_ef9bba4c4a30724315c537c97027b0fc&device=ledoff';
+        
+        try {
+          await fetch(url, { mode: 'no-cors' });
+          console.log(`LED turned ${isOn ? 'ON' : 'OFF'}`);
+        } catch (error) {
+          console.error('Failed to control LED:', error);
+        }
+      } else {
+        alert('Room Light toggled!\n\nConnect to smart home system to make this work.');
+      }
     }
 
     // Shout
