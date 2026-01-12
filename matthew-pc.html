@@ -117,13 +117,13 @@
     // Check PC status on load
     async function checkStatus() {
       try {
-        const response = await fetch(`${PC_SERVER}/status?pin=${PIN}`);
-        if (response.ok) {
-          document.getElementById('statusDot').className = 'w-3 h-3 rounded-full bg-green-500 status-online';
-          document.getElementById('statusText').textContent = 'PC Status: Online';
-        } else {
-          throw new Error('Offline');
-        }
+        const response = await fetch(`${PC_SERVER}/status?pin=${PIN}`, {
+          method: 'GET',
+          mode: 'no-cors'
+        });
+        // With no-cors, we can't read the response, but if it doesn't throw, server is up
+        document.getElementById('statusDot').className = 'w-3 h-3 rounded-full bg-green-500 status-online';
+        document.getElementById('statusText').textContent = 'PC Status: Online';
       } catch (error) {
         document.getElementById('statusDot').className = 'w-3 h-3 rounded-full bg-red-500';
         document.getElementById('statusText').textContent = 'PC Status: Offline';
