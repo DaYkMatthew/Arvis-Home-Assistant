@@ -7,109 +7,428 @@
   <title>ARVIS - Matthew</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <style>
-    * { user-select: none; transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); }
-    body { margin: 0; background: #000; color: #fff; overflow-x: hidden; }
-    .glass { background: rgba(17, 25, 40, 0.75); backdrop-filter: blur(16px) saturate(180%); border: 1px solid rgba(255, 255, 255, 0.125); }
-    @keyframes slideIn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
-    .slide-in { animation: slideIn 0.4s ease-out; }
-    .hover-lift:hover { transform: translateY(-2px); box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.5); }
-    button:active { transform: scale(0.98); }
-    .skeleton { background: linear-gradient(90deg, #1f2937 25%, #374151 50%, #1f2937 75%); background-size: 200% 100%; animation: loading 1.5s infinite; }
-    @keyframes loading { 0% { background-position: 200% 0; } 100% { background-position: -200% 0; } }
-    .switch { position: relative; width: 60px; height: 34px; }
+    * { user-select: none; -webkit-tap-highlight-color: transparent; }
+    body { margin: 0; background: #000; color: #fff; overflow-x: hidden; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; }
+    
+    /* Dynamic weather-based theme */
+    .theme-clear { background: linear-gradient(135deg, #0a0a0a 0%, #1a2332 100%); }
+    .theme-cloudy { background: linear-gradient(135deg, #0a0a0a 0%, #1f2937 100%); }
+    .theme-rainy { background: linear-gradient(135deg, #0a0a0a 0%, #1e293b 100%); }
+    
+    .glass { 
+      background: rgba(17, 25, 40, 0.6); 
+      backdrop-filter: blur(20px) saturate(180%); 
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+    .glass:hover { 
+      background: rgba(17, 25, 40, 0.8); 
+      transform: translateY(-4px); 
+      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.6); 
+      border-color: rgba(255, 255, 255, 0.2);
+    }
+    
+    /* Page transition */
+    .page-transition {
+      position: fixed;
+      inset: 0;
+      background: #000;
+      z-index: 9999;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.3s ease;
+    }
+    .page-transition.active { opacity: 1; }
+    
+    /* Smooth animations */
+    @keyframes slideUp { from { opacity: 0; transform: translateY(30px); } to { opacity: 1; transform: translateY(0); } }
+    .slide-up { animation: slideUp 0.5s cubic-bezier(0.4, 0, 0.2, 1); }
+    .stagger-1 { animation-delay: 0.1s; opacity: 0; animation-fill-mode: forwards; }
+    .stagger-2 { animation-delay: 0.2s; opacity: 0; animation-fill-mode: forwards; }
+    .stagger-3 { animation-delay: 0.3s; opacity: 0; animation-fill-mode: forwards; }
+    .stagger-4 { animation-delay: 0.4s; opacity: 0; animation-fill-mode: forwards; }
+    
+    /* Modern switches */
+    .switch { position: relative; width: 60px; height: 32px; }
     .switch input { opacity: 0; width: 0; height: 0; }
-    .slider { position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: #4b5563; transition: 0.4s; border-radius: 34px; }
-    .slider:before { position: absolute; content: ""; height: 26px; width: 26px; left: 4px; bottom: 4px; background-color: white; transition: 0.3s; border-radius: 50%; }
-    input:checked + .slider { background-color: #10b981; }
-    input:checked + .slider:before { transform: translateX(26px); }
+    .slider {
+      position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0;
+      background: #1f2937; transition: 0.3s; border-radius: 32px;
+      box-shadow: inset 0 2px 4px rgba(0,0,0,0.3);
+    }
+    .slider:before {
+      position: absolute; content: ""; height: 24px; width: 24px;
+      left: 4px; bottom: 4px; background: #fff;
+      transition: 0.3s cubic-bezier(0.4, 0, 0.2, 1); border-radius: 50%;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+    }
+    input:checked + .slider { background: linear-gradient(135deg, #10b981, #059669); }
+    input:checked + .slider:before { transform: translateX(28px); }
+    
+    /* Countdown bars */
+    .countdown-bar {
+      height: 4px;
+      background: rgba(255,255,255,0.1);
+      border-radius: 2px;
+      overflow: hidden;
+      margin-top: 8px;
+    }
+    .countdown-progress {
+      height: 100%;
+      background: linear-gradient(90deg, #3b82f6, #8b5cf6);
+      transition: width 1s ease;
+      border-radius: 2px;
+    }
+    
+    /* Practical modern cards */
+    .card {
+      position: relative;
+      overflow: hidden;
+    }
+    .card::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; right: 0;
+      height: 2px;
+      background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
+      opacity: 0;
+      transition: opacity 0.3s;
+    }
+    .card:hover::before { opacity: 1; }
   </style>
 </head>
-<body>
-  <div class="min-h-screen p-4 slide-in">
-    <div class="flex justify-between items-center mb-6 pt-4">
-      <div><h1 class="text-3xl font-light text-white">ARVIS</h1><p class="text-gray-400 text-sm">Matthew (Admin)</p></div>
-      <button onclick="logout()" class="p-3 rounded-full glass hover-lift"><svg class="w-6 h-6 text-gray-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0110 0v4"/></svg></button>
+<body class="theme-clear">
+  <div class="page-transition" id="pageTransition"></div>
+  
+  <div class="min-h-screen p-4">
+    <div class="flex justify-between items-center mb-6 pt-4 slide-up">
+      <div>
+        <h1 class="text-3xl font-light">ARVIS</h1>
+        <p class="text-gray-400 text-sm">Matthew • Admin</p>
+      </div>
+      <button onclick="logout()" class="p-3 rounded-2xl glass hover-lift">
+        <svg class="w-6 h-6 text-gray-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <rect x="3" y="11" width="18" height="11" rx="2" ry="2"/>
+          <path d="M7 11V7a5 5 0 0110 0v4"/>
+        </svg>
+      </button>
     </div>
 
-    <div class="mb-4 p-5 rounded-2xl glass hover-lift">
-      <div id="time" class="text-5xl font-light mb-2"><div class="skeleton h-14 w-32 rounded"></div></div>
-      <div id="date" class="text-xl text-gray-400 mb-3"><div class="skeleton h-6 w-48 rounded"></div></div>
-      <div id="weather" class="text-2xl text-blue-400 mb-3"><div class="skeleton h-8 w-40 rounded"></div></div>
-      <div class="flex gap-4 text-sm flex-wrap">
-        <div class="flex items-center gap-2"><div class="w-2 h-2 rounded-full bg-green-500 animate-pulse"></div><span class="text-gray-400">Online</span></div>
-        <div class="text-gray-400" id="local-ip"><div class="skeleton h-4 w-32 rounded inline-block"></div></div>
-        <div class="text-gray-400">WiFi: Connected</div>
+    <!-- Time & Weather -->
+    <div class="mb-4 p-6 rounded-3xl glass card slide-up stagger-1">
+      <div id="time" class="text-6xl font-extralight mb-2">--:--</div>
+      <div id="date" class="text-lg text-gray-400 mb-4">Loading...</div>
+      <div id="weather" class="text-2xl font-light flex items-center gap-3 mb-4">
+        <div class="w-12 h-12 rounded-2xl bg-blue-500/20 flex items-center justify-center">
+          <svg class="w-6 h-6 text-blue-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M18 10h-1.26A8 8 0 109 20h9a5 5 0 000-10z"/>
+          </svg>
+        </div>
+        <span>Loading...</span>
+      </div>
+      <div class="flex gap-3 text-sm text-gray-500">
+        <div class="flex items-center gap-1.5">
+          <div class="w-1.5 h-1.5 rounded-full bg-green-500 animate-pulse"></div>
+          <span>Online</span>
+        </div>
+        <div id="local-ip">IP: --</div>
       </div>
     </div>
 
-    <div class="mb-4 p-4 rounded-2xl glass hover-lift">
-      <p id="quote" class="text-base text-gray-300 italic mb-2"><div class="skeleton h-4 w-full rounded mb-2"></div><div class="skeleton h-4 w-3/4 rounded"></div></p>
-      <p id="author" class="text-sm text-gray-500">—</p>
+    <!-- Quote -->
+    <div class="mb-4 p-5 rounded-3xl glass card slide-up stagger-2">
+      <div class="flex items-start gap-3">
+        <div class="text-3xl">💭</div>
+        <div class="flex-1">
+          <p id="quote" class="text-base text-gray-300 italic mb-2">Loading quote...</p>
+          <p id="author" class="text-sm text-gray-500">—</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Countdowns -->
+    <div class="mb-4 p-5 rounded-3xl glass card slide-up stagger-3">
+      <h2 class="text-lg font-light mb-4 flex items-center gap-2">
+        <span>⏱️</span> Countdowns
+      </h2>
+      
+      <!-- Today's Progress -->
+      <div class="mb-3 p-4 rounded-2xl" style="background: rgba(59, 130, 246, 0.1);">
+        <div class="flex justify-between items-center mb-1">
+          <span class="text-sm font-medium">Today's Progress</span>
+          <span class="text-sm text-blue-400 font-mono" id="today-left">--</span>
+        </div>
+        <div class="countdown-bar">
+          <div class="countdown-progress" id="today-progress" style="width: 0%"></div>
+        </div>
+      </div>
+      
+      <!-- Weekend Countdown -->
+      <div class="p-4 rounded-2xl" style="background: rgba(16, 185, 129, 0.1);">
+        <div class="flex justify-between items-center mb-1">
+          <span class="text-sm font-medium">Weekend</span>
+          <span class="text-sm text-green-400 font-mono" id="weekend-time">--</span>
+        </div>
+        <div class="countdown-bar">
+          <div class="countdown-progress" id="weekend-progress" style="width: 0%; background: linear-gradient(90deg, #10b981, #059669);"></div>
+        </div>
+      </div>
     </div>
 
     <!-- Lights -->
-    <div class="mb-4 p-4 rounded-2xl glass hover-lift">
-      <h2 class="text-lg font-light mb-3">Lights</h2>
-      <div class="flex justify-between items-center p-3 rounded-xl glass mb-2">
-        <span>Room Light</span>
-        <label class="switch">
-          <input type="checkbox" id="roomLight" onchange="toggleLight('room')">
-          <span class="slider"></span>
-        </label>
-      </div>
-      <div class="flex justify-between items-center p-3 rounded-xl glass">
-        <span>LED Light</span>
-        <label class="switch">
-          <input type="checkbox" id="ledLight" onchange="toggleLight('led')">
-          <span class="slider"></span>
-        </label>
+    <div class="mb-4 p-5 rounded-3xl glass card slide-up stagger-4">
+      <h2 class="text-lg font-light mb-4 flex items-center gap-2">
+        <span>💡</span> Lights
+      </h2>
+      <div class="space-y-3">
+        <div class="flex items-center justify-between p-4 rounded-2xl" style="background: rgba(255, 255, 255, 0.03);">
+          <div class="flex items-center gap-3">
+            <div class="w-10 h-10 rounded-xl bg-yellow-500/20 flex items-center justify-center">
+              <span class="text-xl">🏠</span>
+            </div>
+            <span class="font-medium">Room Light</span>
+          </div>
+          <label class="switch">
+            <input type="checkbox" id="roomLight" onchange="toggleLight('room')">
+            <span class="slider"></span>
+          </label>
+        </div>
+        <div class="flex items-center justify-between p-4 rounded-2xl" style="background: rgba(255, 255, 255, 0.03);">
+          <div class="flex items-center gap-3">
+            <div class="w-10 h-10 rounded-xl bg-purple-500/20 flex items-center justify-center">
+              <span class="text-xl">✨</span>
+            </div>
+            <span class="font-medium">LED Light</span>
+          </div>
+          <label class="switch">
+            <input type="checkbox" id="ledLight" onchange="toggleLight('led')">
+            <span class="slider"></span>
+          </label>
+        </div>
       </div>
     </div>
 
     <!-- Main Navigation -->
-    <div class="grid grid-cols-2 gap-4 mb-4">
-      <a href="matthew-tv.html" class="p-5 rounded-2xl glass hover-lift text-left" style="background: linear-gradient(135deg, rgba(59, 130, 246, 0.2), rgba(37, 99, 235, 0.2));">
-        <svg class="w-10 h-10 mb-2 text-blue-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-          <rect x="2" y="7" width="20" height="15" rx="2" ry="2"/>
-          <polyline points="17 2 12 7 7 2"/>
-        </svg>
-        <div class="text-lg">TV & Media</div>
-        <div class="text-sm text-gray-400">Control entertainment</div>
+    <div class="grid grid-cols-2 gap-4 slide-up stagger-4">
+      <a href="matthew-tv.html" onclick="pageTransition(event, 'matthew-tv.html')" class="p-6 rounded-3xl glass card text-left" style="background: linear-gradient(135deg, rgba(59, 130, 246, 0.15), rgba(37, 99, 235, 0.1));">
+        <div class="w-14 h-14 rounded-2xl bg-blue-500/20 flex items-center justify-center mb-3">
+          <svg class="w-7 h-7 text-blue-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <rect x="2" y="7" width="20" height="15" rx="2" ry="2"/>
+            <polyline points="17 2 12 7 7 2"/>
+          </svg>
+        </div>
+        <div class="text-xl font-medium mb-1">TV & Media</div>
+        <div class="text-sm text-gray-400">Spotify • Apple TV</div>
       </a>
 
-      <a href="matthew-pc.html" class="p-5 rounded-2xl glass hover-lift text-left" style="background: linear-gradient(135deg, rgba(249, 115, 22, 0.2), rgba(234, 88, 12, 0.2));">
-        <svg class="w-10 h-10 mb-2 text-orange-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-          <rect x="2" y="3" width="20" height="14" rx="2" ry="2"/>
-          <line x1="8" y1="21" x2="16" y2="21"/>
-          <line x1="12" y1="17" x2="12" y2="21"/>
-        </svg>
-        <div class="text-lg">PC Controls</div>
-        <div class="text-sm text-gray-400">Sleep, lock, shutdown</div>
+      <a href="matthew-pc.html" onclick="pageTransition(event, 'matthew-pc.html')" class="p-6 rounded-3xl glass card text-left" style="background: linear-gradient(135deg, rgba(249, 115, 22, 0.15), rgba(234, 88, 12, 0.1));">
+        <div class="w-14 h-14 rounded-2xl bg-orange-500/20 flex items-center justify-center mb-3">
+          <svg class="w-7 h-7 text-orange-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <rect x="2" y="3" width="20" height="14" rx="2" ry="2"/>
+            <line x1="8" y1="21" x2="16" y2="21"/>
+            <line x1="12" y1="17" x2="12" y2="21"/>
+          </svg>
+        </div>
+        <div class="text-xl font-medium mb-1">PC Controls</div>
+        <div class="text-sm text-gray-400">Sleep • Lock • Shutdown</div>
       </a>
     </div>
   </div>
 
   <script>
+    // Page transitions
+    function pageTransition(e, url) {
+      e.preventDefault();
+      const transition = document.getElementById('pageTransition');
+      transition.classList.add('active');
+      setTimeout(() => window.location.href = url, 300);
+    }
+
+    // Auto-lock after 5 minutes
     let inactivityTimer;
-    function resetInactivityTimer() { clearTimeout(inactivityTimer); inactivityTimer = setTimeout(() => logout(), 5 * 60 * 1000); }
-    document.addEventListener('click', resetInactivityTimer); document.addEventListener('touchstart', resetInactivityTimer); resetInactivityTimer();
+    function resetInactivity() { 
+      clearTimeout(inactivityTimer); 
+      inactivityTimer = setTimeout(() => logout(), 5 * 60 * 1000); 
+    }
+    document.addEventListener('click', resetInactivity);
+    document.addEventListener('touchstart', resetInactivity);
+    resetInactivity();
 
-    function updateTime() { const now = new Date(); document.getElementById('time').innerHTML = now.toLocaleTimeString('en-US', {hour: 'numeric', minute: '2-digit', hour12: true}); document.getElementById('date').innerHTML = now.toLocaleDateString('en-US', {weekday: 'long', month: 'long', day: 'numeric'}); }
-    setInterval(updateTime, 1000); updateTime();
+    // Time & Date
+    function updateTime() {
+      const now = new Date();
+      document.getElementById('time').textContent = now.toLocaleTimeString('en-US', {
+        hour: 'numeric', 
+        minute: '2-digit', 
+        hour12: true
+      });
+      document.getElementById('date').textContent = now.toLocaleDateString('en-US', {
+        weekday: 'long', 
+        month: 'long', 
+        day: 'numeric'
+      });
+    }
+    setInterval(updateTime, 1000);
+    updateTime();
 
-    function getLocalIP() { fetch('https://api.ipify.org?format=json').then(res => res.json()).then(data => { document.getElementById('local-ip').innerHTML = `IP: ${data.ip}`; }).catch(() => { document.getElementById('local-ip').innerHTML = 'IP: Unavailable'; }); }
-    getLocalIP();
+    // Local IP
+    fetch('https://api.ipify.org?format=json')
+      .then(res => res.json())
+      .then(data => document.getElementById('local-ip').textContent = `IP: ${data.ip}`)
+      .catch(() => document.getElementById('local-ip').textContent = 'IP: Offline');
 
-    async function fetchWeather() { try { let lat = 37.3382, lon = -121.8863; if ('geolocation' in navigator) { const pos = await new Promise((resolve, reject) => { navigator.geolocation.getCurrentPosition(resolve, reject); }); lat = pos.coords.latitude; lon = pos.coords.longitude; } const res = await fetch(`https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current_weather=true&temperature_unit=fahrenheit`); const data = await res.json(); const temp = Math.round(data.current_weather.temperature); const condition = data.current_weather.weathercode === 0 ? 'Clear' : data.current_weather.weathercode <= 3 ? 'Cloudy' : 'Rainy'; document.getElementById('weather').innerHTML = `${temp}°F - ${condition}`; } catch { document.getElementById('weather').innerHTML = 'Weather unavailable'; } }
+    // Weather with theme change
+    async function fetchWeather() {
+      try {
+        let lat = 37.3382, lon = -121.8863;
+        if ('geolocation' in navigator) {
+          const pos = await new Promise((res, rej) => navigator.geolocation.getCurrentPosition(res, rej));
+          lat = pos.coords.latitude;
+          lon = pos.coords.longitude;
+        }
+        
+        const res = await fetch(`https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current_weather=true&temperature_unit=fahrenheit`);
+        const data = await res.json();
+        const temp = Math.round(data.current_weather.temperature);
+        const code = data.current_weather.weathercode;
+        
+        let condition, theme, icon;
+        if (code === 0) {
+          condition = 'Clear';
+          theme = 'theme-clear';
+          icon = '☀️';
+        } else if (code <= 3) {
+          condition = 'Cloudy';
+          theme = 'theme-cloudy';
+          icon = '☁️';
+        } else {
+          condition = 'Rainy';
+          theme = 'theme-rainy';
+          icon = '🌧️';
+        }
+        
+        // Apply weather theme
+        document.body.className = theme;
+        
+        document.getElementById('weather').innerHTML = `
+          <div class="w-12 h-12 rounded-2xl bg-blue-500/20 flex items-center justify-center text-2xl">
+            ${icon}
+          </div>
+          <span>${temp}°F • ${condition}</span>
+        `;
+      } catch {
+        document.getElementById('weather').textContent = 'Weather unavailable';
+      }
+    }
     fetchWeather();
 
-    async function fetchQuote() { try { const res = await fetch('https://api.quotable.io/quotes/random?maxLength=100'); const data = await res.json(); if (data && data[0]) { document.getElementById('quote').innerHTML = `"${data[0].content}"`; document.getElementById('author').innerHTML = `— ${data[0].author}`; } } catch { document.getElementById('quote').innerHTML = '"The only way to do great work is to love what you do."'; document.getElementById('author').innerHTML = '— Steve Jobs'; } }
+    // Quote API (trying ZenQuotes - actually free and works)
+    async function fetchQuote() {
+      try {
+        const res = await fetch('https://zenquotes.io/api/random');
+        const data = await res.json();
+        document.getElementById('quote').textContent = `"${data[0].q}"`;
+        document.getElementById('author').textContent = `— ${data[0].a}`;
+      } catch {
+        try {
+          // Fallback to Quotable
+          const res = await fetch('https://api.quotable.io/quotes/random?maxLength=100');
+          const data = await res.json();
+          if (data && data[0]) {
+            document.getElementById('quote').textContent = `"${data[0].content}"`;
+            document.getElementById('author').textContent = `— ${data[0].author}`;
+          }
+        } catch {
+          document.getElementById('quote').textContent = '"The only way to do great work is to love what you do."';
+          document.getElementById('author').textContent = '— Steve Jobs';
+        }
+      }
+    }
     fetchQuote();
 
-    // Light control with VoiceMonkey
-    const VOICEMONKEY_TOKEN = 'a39d2a6a59188f40be7fd47dcc8ada77_ef9bba4c4a30724315c537c97027b0fc';
+    // Today's countdown (time left until midnight)
+    function updateTodayCountdown() {
+      const now = new Date();
+      const midnight = new Date(now);
+      midnight.setHours(24, 0, 0, 0);
+      
+      const diff = midnight - now;
+      const hours = Math.floor(diff / (1000 * 60 * 60));
+      const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+      
+      document.getElementById('today-left').textContent = `${hours}h ${minutes}m left`;
+      
+      // Progress bar (how much of day is done)
+      const dayStart = new Date(now);
+      dayStart.setHours(0, 0, 0, 0);
+      const dayTotal = 24 * 60 * 60 * 1000;
+      const elapsed = now - dayStart;
+      const progress = (elapsed / dayTotal) * 100;
+      document.getElementById('today-progress').style.width = `${progress}%`;
+    }
+    setInterval(updateTodayCountdown, 1000);
+    updateTodayCountdown();
+
+    // Weekend countdown (Fri 3:45 PM → Sun 12:00 AM)
+    function updateWeekendCountdown() {
+      const now = new Date();
+      const day = now.getDay();
+      const hour = now.getHours();
+      const minute = now.getMinutes();
+      
+      let target, totalTime;
+      
+      // If it's before Friday 3:45 PM
+      if (day < 5 || (day === 5 && (hour < 15 || (hour === 15 && minute < 45)))) {
+        target = new Date(now);
+        target.setDate(now.getDate() + ((5 - day + 7) % 7));
+        target.setHours(15, 45, 0, 0);
+        if (day === 5 && hour >= 15 && minute >= 45) target.setDate(target.getDate() + 7);
+        
+        // Total time from now to weekend start
+        totalTime = target - now;
+      } 
+      // If it's during the weekend
+      else if (day === 5 || day === 6 || (day === 0 && hour < 0)) {
+        // Weekend is happening! Show time until it ends
+        target = new Date(now);
+        target.setDate(now.getDate() + ((7 - day) % 7));
+        target.setHours(0, 0, 0, 0);
+        totalTime = target - now;
+      }
+      // If it's after Sunday 12 AM
+      else {
+        target = new Date(now);
+        target.setDate(now.getDate() + ((5 - day + 7) % 7));
+        target.setHours(15, 45, 0, 0);
+        totalTime = target - now;
+      }
+      
+      const diff = target - now;
+      const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+      const hours = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+      const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+      
+      let text = '';
+      if (days > 0) text += `${days}d `;
+      text += `${hours}h ${minutes}m`;
+      
+      document.getElementById('weekend-time').textContent = text;
+      
+      // Progress (inverse - shows time passing)
+      const weekTotal = 7 * 24 * 60 * 60 * 1000; // 1 week
+      const elapsed = weekTotal - totalTime;
+      const progress = Math.min(100, (elapsed / weekTotal) * 100);
+      document.getElementById('weekend-progress').style.width = `${progress}%`;
+    }
+    setInterval(updateWeekendCountdown, 1000);
+    updateWeekendCountdown();
+
+    // Lights - Check actual state on load using VoiceMonkey
+    const VM_TOKEN = 'a39d2a6a59188f40be7fd47dcc8ada77_ef9bba4c4a30724315c537c97027b0fc';
     
     window.addEventListener('load', () => {
+      // Load saved states
       const roomState = localStorage.getItem('roomLight') === 'true';
       const ledState = localStorage.getItem('ledLight') === 'true';
       document.getElementById('roomLight').checked = roomState;
@@ -128,18 +447,21 @@
       const device = isOn ? devices[type].on : devices[type].off;
       
       try {
-        await fetch(`https://api-v2.voicemonkey.io/trigger?token=${VOICEMONKEY_TOKEN}&device=${device}`, {
+        await fetch(`https://api-v2.voicemonkey.io/trigger?token=${VM_TOKEN}&device=${device}`, {
           method: 'GET',
           mode: 'no-cors'
         });
         localStorage.setItem(type === 'room' ? 'roomLight' : 'ledLight', isOn);
       } catch (error) {
-        console.error('Failed to toggle light:', error);
+        console.error('Light control failed:', error);
         checkbox.checked = !isOn;
       }
     }
 
-    function logout() { sessionStorage.clear(); window.location.href = 'index.html'; }
+    function logout() {
+      sessionStorage.clear();
+      window.location.href = 'index.html';
+    }
   </script>
 </body>
 </html>
